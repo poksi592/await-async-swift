@@ -27,7 +27,7 @@ func sumAndDifferenceAndMultiplication(number1: Int,
 
 // Running them dependently with Semaphores
 //
-let semaphore = DispatchSemaphore(value: 0)
+var semaphore = DispatchSemaphore(value: 0)
 let queue = DispatchQueue.global()
 
 var sumResult: Int? = nil
@@ -36,23 +36,31 @@ var multiplicationResult: Int? = nil
 
 sum(number1: 1, number2: 2) { (sum) in
     sumResult = sum
+    semaphore.signal()
 }
+semaphore.wait(timeout: .now() + 2.0)
 print(sumResult!)
 
+semaphore = DispatchSemaphore(value: 0)
 sumAndDifference(number1: sumResult!, number2: 3) { (sum, difference) in
     sumResult = sum
     differenceResult = difference
+    semaphore.signal()
 }
+semaphore.wait(timeout: .now() + 2.0)
 print(sumResult!)
 print(differenceResult!)
 
+semaphore = DispatchSemaphore(value: 0)
 sumAndDifferenceAndMultiplication(number1: sumResult!,
                                           number2: differenceResult!)
                                           { (sum, difference, multiplication) in
     sumResult = sum
     differenceResult = difference
     multiplicationResult = multiplication
+    semaphore.signal()
 }
+semaphore.wait(timeout: .now() + 2.0)
 print(sumResult!)
 print(differenceResult!)
 print(multiplicationResult!)
